@@ -100,6 +100,12 @@ Now reset the account password, using the `admin` account:
 kanidm service-account credential generate --name admin radius_service_account
 ```
 
+To use this account for radius you need an api token, that is then specified in `/data/kanidm` as `auth_token`:
+
+```bash
+kanidm service-account api-token generate --name radius_service_account radius_service_account radius
+```
+
 ## Deploying a RADIUS Container
 
 We provide a RADIUS container that has all the needed integrations. This container requires some
@@ -113,14 +119,15 @@ configuration)
 | cert.pem | The certificate for the RADIUS server                         |
 | key.pem  | The signing key for the RADIUS certificate                    |
 
+The cryptographic material should be placed in `/data/kanidm` and will be copyed to the `/etc/raddb/certs`.
+
 The configuration file (`/data/kanidm`) has the following template:
 
 ```toml
 uri = "https://example.com" # URL to the Kanidm server
 verify_hostnames = true     # verify the hostname of the Kanidm server
 
-verify_ca = false           # Strict CA verification
-ca = /data/ca.pem           # Path to the kanidm ca
+verify_ca = "/data/ca.pem"  # Path to the kanidm ca
 
 auth_token = "ABC..."       # Auth token for the service account
                             # See: kanidm service-account api-token generate
